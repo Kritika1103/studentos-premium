@@ -1,11 +1,25 @@
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("studentos_loggedin") === "true";
+  });
+
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem("studentos_username") || "Kritika";
+  });
+
+  const [loginInput, setLoginInput] = useState("");
+
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("studentos_theme") || "dark";
+  });
+
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("studentos_tasks");
+    const saved = localStorage.getItem("studentos_tasks_v7");
     return saved
       ? JSON.parse(saved)
       : [
@@ -16,7 +30,7 @@ function App() {
   });
 
   const [notes, setNotes] = useState(() => {
-    const saved = localStorage.getItem("studentos_notes");
+    const saved = localStorage.getItem("studentos_notes_v7");
     return saved
       ? JSON.parse(saved)
       : [
@@ -26,7 +40,7 @@ function App() {
   });
 
   const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem("studentos_goals");
+    const saved = localStorage.getItem("studentos_goals_v7");
     return saved
       ? JSON.parse(saved)
       : [
@@ -37,7 +51,7 @@ function App() {
   });
 
   const [attendance, setAttendance] = useState(() => {
-    const saved = localStorage.getItem("studentos_attendance");
+    const saved = localStorage.getItem("studentos_attendance_v7");
     return saved
       ? JSON.parse(saved)
       : [
@@ -58,26 +72,65 @@ function App() {
     { day: "Sun", hours: 1.5 },
   ]);
 
+  const quotes = [
+    "Success is the sum of small efforts repeated daily.",
+    "Discipline beats motivation when motivation fades.",
+    "Study now so your future self says thank you.",
+    "Small progress each day adds up to big results.",
+    "Focus on consistency, not perfection.",
+  ];
+
+  const [quoteIndex, setQuoteIndex] = useState(() => {
+    return Number(localStorage.getItem("studentos_quote_index")) || 0;
+  });
+
   const [newTask, setNewTask] = useState("");
   const [newNote, setNewNote] = useState("");
-  const [pomodoroSeconds, setPomodoroSeconds] = useState(25 * 60);
+  const [newSubject, setNewSubject] = useState("");
+  const [newGoal, setNewGoal] = useState("");
+  const [newGoalProgress, setNewGoalProgress] = useState("");
+  const [pomodoroSeconds, setPomodoroSeconds] = useState(() => {
+    const saved = localStorage.getItem("studentos_pomodoro_v7");
+    return saved ? Number(saved) : 25 * 60;
+  });
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("studentos_tasks", JSON.stringify(tasks));
+    document.body.className = theme === "dark" ? "theme-dark" : "theme-light";
+    localStorage.setItem("studentos_theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("studentos_tasks_v7", JSON.stringify(tasks));
   }, [tasks]);
 
   useEffect(() => {
-    localStorage.setItem("studentos_notes", JSON.stringify(notes));
+    localStorage.setItem("studentos_notes_v7", JSON.stringify(notes));
   }, [notes]);
 
   useEffect(() => {
-    localStorage.setItem("studentos_goals", JSON.stringify(goals));
+    localStorage.setItem("studentos_goals_v7", JSON.stringify(goals));
   }, [goals]);
 
   useEffect(() => {
-    localStorage.setItem("studentos_attendance", JSON.stringify(attendance));
+    localStorage.setItem("studentos_attendance_v7", JSON.stringify(attendance));
   }, [attendance]);
+
+  useEffect(() => {
+    localStorage.setItem("studentos_pomodoro_v7", pomodoroSeconds.toString());
+  }, [pomodoroSeconds]);
+
+  useEffect(() => {
+    localStorage.setItem("studentos_quote_index", quoteIndex.toString());
+  }, [quoteIndex]);
+
+  useEffect(() => {
+    localStorage.setItem("studentos_loggedin", isLoggedIn.toString());
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    localStorage.setItem("studentos_username", username);
+  }, [username]);
 
   useEffect(() => {
     let timer;
@@ -94,6 +147,7 @@ function App() {
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.done).length;
+
   const attendanceAverage = useMemo(() => {
     const totalPresent = attendance.reduce(
       (sum, item) => sum + item.present,
@@ -111,6 +165,20 @@ function App() {
     if (totalTasks === 0) return 100;
     return Math.round((completedTasks / totalTasks) * 100);
   }, [completedTasks, totalTasks]);
+
+  const today = new Date();
+  const currentDate = today.toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
 
   const addTask = () => {
     if (!newTask.trim()) return;
@@ -140,6 +208,22 @@ function App() {
     setNotes(notes.filter((note) => note.id !== id));
   };
 
+  const addSubject = () => {
+    if (!newSubject.trim()) return;
+    const exists = attendance.some(
+      (item) => item.subject.toLowerCase() === newSubject.trim().toLowerCase(),
+    );
+    if (exists) {
+      alert("Subject already exists!");
+      return;
+    }
+    setAttendance([
+      ...attendance,
+      { subject: newSubject.trim(), present: 0, total: 0 },
+    ]);
+    setNewSubject("");
+  };
+
   const updateAttendance = (subject, type) => {
     setAttendance((prev) =>
       prev.map((item) => {
@@ -152,10 +236,64 @@ function App() {
     );
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  const addGoal = () => {
+    if (!newGoal.trim() || newGoalProgress === "") return;
+    const progress = Math.max(0, Math.min(100, Number(newGoalProgress)));
+    setGoals([...goals, { id: Date.now(), text: newGoal.trim(), progress }]);
+    setNewGoal("");
+    setNewGoalProgress("");
+  };
+
+  const updateGoalProgress = (id, value) => {
+    const progress = Math.max(0, Math.min(100, Number(value)));
+    setGoals((prev) =>
+      prev.map((goal) => (goal.id === id ? { ...goal, progress } : goal)),
+    );
+  };
+
+  const deleteGoal = (id) => {
+    setGoals(goals.filter((goal) => goal.id !== id));
+  };
+
+  const exportData = () => {
+    const content = `
+StudentOS v7 Export
+===================
+
+User: ${username}
+Date: ${currentDate}
+
+TASKS
+-----
+${tasks.map((t) => `- [${t.done ? "x" : " "}] ${t.text}`).join("\n")}
+
+NOTES
+-----
+${notes.map((n) => `- ${n.text}`).join("\n")}
+
+GOALS
+-----
+${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
+`;
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "studentos-v7-data.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const login = () => {
+    const name = loginInput.trim() || "Kritika";
+    setUsername(name);
+    setIsLoggedIn(true);
+  };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setActiveTab("Dashboard");
   };
 
   const navItems = [
@@ -165,8 +303,34 @@ function App() {
     "Study",
     "Attendance",
     "Goals",
+    "Calendar",
     "Pomodoro",
   ];
+
+  if (!isLoggedIn) {
+    return (
+      <div className="login-page">
+        <div className="login-card">
+          <div className="login-icon">🎓</div>
+          <h1>StudentOS v7</h1>
+          <p>Your smart student productivity dashboard</p>
+
+          <input
+            type="text"
+            placeholder="Enter your name..."
+            value={loginInput}
+            onChange={(e) => setLoginInput(e.target.value)}
+          />
+
+          <button onClick={login}>Enter Dashboard</button>
+
+          <div className="login-note">
+            <span>✨ Portfolio Edition</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -176,19 +340,31 @@ function App() {
             <div className="card card-large hero-card">
               <div className="hero-top">
                 <div>
-                  <p className="eyebrow">StudentOS v6</p>
-                  <h1>Welcome back 👋</h1>
+                  <p className="eyebrow">StudentOS v7</p>
+                  <h1>Welcome back, {username} 👋</h1>
                   <p className="muted">
-                    Manage tasks, notes, attendance, goals, and focus sessions
-                    in one beautiful dashboard.
+                    Stay productive with tasks, notes, attendance, goals, focus
+                    sessions, and smarter student tools.
                   </p>
+                  <p className="date-line">{currentDate}</p>
                 </div>
-                <div className="hero-badge">Productive Mode</div>
+                <div className="hero-actions">
+                  <button
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                  >
+                    {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+                  </button>
+                  <button className="secondary-btn" onClick={exportData}>
+                    Export Data
+                  </button>
+                </div>
               </div>
 
               <div className="stats-grid">
                 <div className="stat-box">
-                  <span>Today’s Tasks</span>
+                  <span>Tasks</span>
                   <h2>{totalTasks}</h2>
                   <p>{completedTasks} completed</p>
                 </div>
@@ -281,24 +457,25 @@ function App() {
 
             <div className="card">
               <div className="section-title">
-                <h3>Focus Timer ⏳</h3>
+                <h3>Quote of the Day 💬</h3>
               </div>
+              <div className="quote-box">
+                <p>“{quotes[quoteIndex % quotes.length]}”</p>
+                <button onClick={() => setQuoteIndex((prev) => prev + 1)}>
+                  New Quote
+                </button>
+              </div>
+            </div>
 
-              <div className="timer-box">
-                <h1>{formatTime(pomodoroSeconds)}</h1>
-                <div className="timer-actions">
-                  <button onClick={() => setIsRunning(!isRunning)}>
-                    {isRunning ? "Pause" : "Start"}
-                  </button>
-                  <button
-                    className="secondary-btn"
-                    onClick={() => {
-                      setIsRunning(false);
-                      setPomodoroSeconds(25 * 60);
-                    }}
-                  >
-                    Reset
-                  </button>
+            <div className="card">
+              <div className="section-title">
+                <h3>Mini Calendar 📅</h3>
+              </div>
+              <div className="calendar-box">
+                <div className="calendar-date">{today.getDate()}</div>
+                <div>
+                  <h4>{today.toLocaleString("en-IN", { month: "long" })}</h4>
+                  <p>{today.toLocaleString("en-IN", { weekday: "long" })}</p>
                 </div>
               </div>
             </div>
@@ -311,13 +488,13 @@ function App() {
             <div className="card">
               <div className="section-title">
                 <h2>Task Manager</h2>
-                <p>Stay organized and finish your work on time.</p>
+                <p>Track all your daily tasks here.</p>
               </div>
 
               <div className="input-row">
                 <input
                   type="text"
-                  placeholder="Add a new task..."
+                  placeholder="Add a task..."
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
                 />
@@ -356,13 +533,13 @@ function App() {
             <div className="card">
               <div className="section-title">
                 <h2>Quick Notes</h2>
-                <p>Capture important reminders instantly.</p>
+                <p>Save important reminders and study points.</p>
               </div>
 
               <div className="input-row">
                 <input
                   type="text"
-                  placeholder="Write your note..."
+                  placeholder="Write a note..."
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                 />
@@ -392,7 +569,7 @@ function App() {
             <div className="card">
               <div className="section-title">
                 <h2>Study Tracker</h2>
-                <p>Your weekly learning consistency.</p>
+                <p>See your weekly study consistency.</p>
               </div>
 
               <div className="chart-wrap">
@@ -419,12 +596,24 @@ function App() {
             <div className="card">
               <div className="section-title">
                 <h2>Attendance Tracker</h2>
-                <p>Track your subject-wise attendance.</p>
+                <p>Add subjects and update your class attendance.</p>
+              </div>
+
+              <div className="input-row">
+                <input
+                  type="text"
+                  placeholder="Add new subject..."
+                  value={newSubject}
+                  onChange={(e) => setNewSubject(e.target.value)}
+                />
+                <button onClick={addSubject}>Add Subject</button>
               </div>
 
               <div className="attendance-list">
                 {attendance.map((item) => {
-                  const percent = Math.round((item.present / item.total) * 100);
+                  const percent = item.total
+                    ? Math.round((item.present / item.total) * 100)
+                    : 0;
                   return (
                     <div className="attendance-card" key={item.subject}>
                       <div className="attendance-head">
@@ -471,7 +660,23 @@ function App() {
             <div className="card">
               <div className="section-title">
                 <h2>Goals Tracker</h2>
-                <p>Track your academic targets and progress.</p>
+                <p>Create and update your academic goals.</p>
+              </div>
+
+              <div className="goal-form">
+                <input
+                  type="text"
+                  placeholder="Goal title..."
+                  value={newGoal}
+                  onChange={(e) => setNewGoal(e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Progress %"
+                  value={newGoalProgress}
+                  onChange={(e) => setNewGoalProgress(e.target.value)}
+                />
+                <button onClick={addGoal}>Add Goal</button>
               </div>
 
               <div className="goals-list">
@@ -481,14 +686,69 @@ function App() {
                       <h4>{goal.text}</h4>
                       <span>{goal.progress}%</span>
                     </div>
+
                     <div className="progress-bar">
                       <div
                         className="progress-fill goal-fill"
                         style={{ width: `${goal.progress}%` }}
                       ></div>
                     </div>
+
+                    <div className="goal-actions">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={goal.progress}
+                        onChange={(e) =>
+                          updateGoalProgress(goal.id, e.target.value)
+                        }
+                      />
+                      <button
+                        className="danger-btn"
+                        onClick={() => deleteGoal(goal.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case "Calendar":
+        return (
+          <div className="single-page">
+            <div className="card calendar-page">
+              <div className="section-title">
+                <h2>Calendar View</h2>
+                <p>Simple academic date widget for your daily planning.</p>
+              </div>
+
+              <div className="calendar-big">
+                <div className="calendar-big-number">{today.getDate()}</div>
+                <div className="calendar-big-info">
+                  <h3>{today.toLocaleString("en-IN", { month: "long" })}</h3>
+                  <p>{today.toLocaleString("en-IN", { weekday: "long" })}</p>
+                  <span>{today.getFullYear()}</span>
+                </div>
+              </div>
+
+              <div className="calendar-tips">
+                <div className="tip-card">
+                  <h4>📘 Study Tip</h4>
+                  <p>Plan 3 important tasks every morning.</p>
+                </div>
+                <div className="tip-card">
+                  <h4>🎯 Focus Tip</h4>
+                  <p>Use 25-minute focus blocks with 5-minute breaks.</p>
+                </div>
+                <div className="tip-card">
+                  <h4>📝 Reminder</h4>
+                  <p>Review your notes before sleeping for better retention.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -500,7 +760,7 @@ function App() {
             <div className="card pomodoro-page">
               <div className="section-title">
                 <h2>Pomodoro Focus Timer</h2>
-                <p>Boost concentration with focused study sessions.</p>
+                <p>Use focused study sessions to improve concentration.</p>
               </div>
 
               <div className="big-timer">
@@ -530,27 +790,29 @@ function App() {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${theme === "light" ? "light-shell" : ""}`}>
       <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-icon">🎓</div>
-          <div>
-            <h2>StudentOS</h2>
-            <p>v6 Pro</p>
+        <div>
+          <div className="brand">
+            <div className="brand-icon">🎓</div>
+            <div>
+              <h2>StudentOS</h2>
+              <p>v7 Premium</p>
+            </div>
           </div>
-        </div>
 
-        <nav className="nav-menu">
-          {navItems.map((item) => (
-            <button
-              key={item}
-              className={`nav-item ${activeTab === item ? "active" : ""}`}
-              onClick={() => setActiveTab(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </nav>
+          <nav className="nav-menu">
+            {navItems.map((item) => (
+              <button
+                key={item}
+                className={`nav-item ${activeTab === item ? "active" : ""}`}
+                onClick={() => setActiveTab(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </nav>
+        </div>
 
         <div className="sidebar-footer">
           <p>Focus Time</p>
@@ -558,16 +820,26 @@ function App() {
           <button onClick={() => setActiveTab("Pomodoro")}>
             Open Focus Session
           </button>
+          <button className="logout-btn" onClick={logout}>
+            Logout
+          </button>
         </div>
       </aside>
 
       <main className="main-content">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Dashboard</p>
+            <p className="eyebrow">Productivity Dashboard</p>
             <h2>{activeTab}</h2>
           </div>
-          <div className="profile-pill">Kritika Manani</div>
+          <div className="topbar-actions">
+            <div className="profile-pill">{username}</div>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+          </div>
         </header>
 
         {renderContent()}
