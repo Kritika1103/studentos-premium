@@ -2,56 +2,71 @@ import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem("studentos_loggedin") === "true";
-  });
-
-  const [username, setUsername] = useState(() => {
-    return localStorage.getItem("studentos_username") || "Kritika";
-  });
-
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => localStorage.getItem("studentos_final_loggedin") === "true",
+  );
+  const [username, setUsername] = useState(
+    () => localStorage.getItem("studentos_final_username") || "Kritika",
+  );
   const [loginInput, setLoginInput] = useState("");
 
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("studentos_theme") || "dark";
-  });
-
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("studentos_final_theme") || "dark",
+  );
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const [tasks, setTasks] = useState(() => {
-    const saved = localStorage.getItem("studentos_tasks_v7");
+    const saved = localStorage.getItem("studentos_final_tasks");
     return saved
       ? JSON.parse(saved)
       : [
-          { id: 1, text: "Complete DBMS notes", done: false },
-          { id: 2, text: "Practice 2 coding questions", done: true },
-          { id: 3, text: "Attend OS lecture at 2 PM", done: false },
+          {
+            id: 1,
+            text: "Complete DBMS notes",
+            done: false,
+            category: "Study",
+            deadline: "2026-04-18",
+          },
+          {
+            id: 2,
+            text: "Practice 3 DSA questions",
+            done: true,
+            category: "Coding",
+            deadline: "2026-04-16",
+          },
+          {
+            id: 3,
+            text: "Attend OS lab submission",
+            done: false,
+            category: "College",
+            deadline: "2026-04-20",
+          },
         ];
   });
 
   const [notes, setNotes] = useState(() => {
-    const saved = localStorage.getItem("studentos_notes_v7");
+    const saved = localStorage.getItem("studentos_final_notes");
     return saved
       ? JSON.parse(saved)
       : [
           { id: 1, text: "Revise DBMS normalization before Friday." },
-          { id: 2, text: "Ask professor about OS lab submission." },
+          { id: 2, text: "Prepare CN viva questions." },
         ];
   });
 
   const [goals, setGoals] = useState(() => {
-    const saved = localStorage.getItem("studentos_goals_v7");
+    const saved = localStorage.getItem("studentos_final_goals");
     return saved
       ? JSON.parse(saved)
       : [
-          { id: 1, text: "Maintain 85%+ attendance", progress: 85 },
-          { id: 2, text: "Finish 50 DSA problems this month", progress: 64 },
-          { id: 3, text: "Study 2 hours daily", progress: 78 },
+          { id: 1, text: "Maintain 85%+ attendance", progress: 86 },
+          { id: 2, text: "Solve 50 DSA questions this month", progress: 62 },
+          { id: 3, text: "Study 2 hours daily", progress: 74 },
         ];
   });
 
   const [attendance, setAttendance] = useState(() => {
-    const saved = localStorage.getItem("studentos_attendance_v7");
+    const saved = localStorage.getItem("studentos_final_attendance");
     return saved
       ? JSON.parse(saved)
       : [
@@ -80,57 +95,75 @@ function App() {
     "Focus on consistency, not perfection.",
   ];
 
-  const [quoteIndex, setQuoteIndex] = useState(() => {
-    return Number(localStorage.getItem("studentos_quote_index")) || 0;
-  });
+  const [quoteIndex, setQuoteIndex] = useState(
+    () => Number(localStorage.getItem("studentos_final_quote")) || 0,
+  );
 
   const [newTask, setNewTask] = useState("");
+  const [newTaskCategory, setNewTaskCategory] = useState("Study");
+  const [newTaskDeadline, setNewTaskDeadline] = useState("");
+  const [taskSearch, setTaskSearch] = useState("");
+
   const [newNote, setNewNote] = useState("");
+  const [noteSearch, setNoteSearch] = useState("");
+
   const [newSubject, setNewSubject] = useState("");
+
   const [newGoal, setNewGoal] = useState("");
   const [newGoalProgress, setNewGoalProgress] = useState("");
+
   const [pomodoroSeconds, setPomodoroSeconds] = useState(() => {
-    const saved = localStorage.getItem("studentos_pomodoro_v7");
+    const saved = localStorage.getItem("studentos_final_pomodoro");
     return saved ? Number(saved) : 25 * 60;
   });
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     document.body.className = theme === "dark" ? "theme-dark" : "theme-light";
-    localStorage.setItem("studentos_theme", theme);
+    localStorage.setItem("studentos_final_theme", theme);
   }, [theme]);
 
-  useEffect(() => {
-    localStorage.setItem("studentos_tasks_v7", JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_notes_v7", JSON.stringify(notes));
-  }, [notes]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_goals_v7", JSON.stringify(goals));
-  }, [goals]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_attendance_v7", JSON.stringify(attendance));
-  }, [attendance]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_pomodoro_v7", pomodoroSeconds.toString());
-  }, [pomodoroSeconds]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_quote_index", quoteIndex.toString());
-  }, [quoteIndex]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_loggedin", isLoggedIn.toString());
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    localStorage.setItem("studentos_username", username);
-  }, [username]);
+  useEffect(
+    () => localStorage.setItem("studentos_final_tasks", JSON.stringify(tasks)),
+    [tasks],
+  );
+  useEffect(
+    () => localStorage.setItem("studentos_final_notes", JSON.stringify(notes)),
+    [notes],
+  );
+  useEffect(
+    () => localStorage.setItem("studentos_final_goals", JSON.stringify(goals)),
+    [goals],
+  );
+  useEffect(
+    () =>
+      localStorage.setItem(
+        "studentos_final_attendance",
+        JSON.stringify(attendance),
+      ),
+    [attendance],
+  );
+  useEffect(
+    () =>
+      localStorage.setItem(
+        "studentos_final_pomodoro",
+        pomodoroSeconds.toString(),
+      ),
+    [pomodoroSeconds],
+  );
+  useEffect(
+    () => localStorage.setItem("studentos_final_quote", quoteIndex.toString()),
+    [quoteIndex],
+  );
+  useEffect(
+    () =>
+      localStorage.setItem("studentos_final_loggedin", isLoggedIn.toString()),
+    [isLoggedIn],
+  );
+  useEffect(
+    () => localStorage.setItem("studentos_final_username", username),
+    [username],
+  );
 
   useEffect(() => {
     let timer;
@@ -182,8 +215,19 @@ function App() {
 
   const addTask = () => {
     if (!newTask.trim()) return;
-    setTasks([...tasks, { id: Date.now(), text: newTask.trim(), done: false }]);
+    setTasks([
+      ...tasks,
+      {
+        id: Date.now(),
+        text: newTask.trim(),
+        done: false,
+        category: newTaskCategory,
+        deadline: newTaskDeadline || "No deadline",
+      },
+    ]);
     setNewTask("");
+    setNewTaskCategory("Study");
+    setNewTaskDeadline("");
   };
 
   const toggleTask = (id) => {
@@ -198,6 +242,12 @@ function App() {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
+  const filteredTasks = tasks.filter(
+    (task) =>
+      task.text.toLowerCase().includes(taskSearch.toLowerCase()) ||
+      task.category.toLowerCase().includes(taskSearch.toLowerCase()),
+  );
+
   const addNote = () => {
     if (!newNote.trim()) return;
     setNotes([...notes, { id: Date.now(), text: newNote.trim() }]);
@@ -207,6 +257,10 @@ function App() {
   const deleteNote = (id) => {
     setNotes(notes.filter((note) => note.id !== id));
   };
+
+  const filteredNotes = notes.filter((note) =>
+    note.text.toLowerCase().includes(noteSearch.toLowerCase()),
+  );
 
   const addSubject = () => {
     if (!newSubject.trim()) return;
@@ -257,15 +311,15 @@ function App() {
 
   const exportData = () => {
     const content = `
-StudentOS v7 Export
-===================
+StudentOS FINAL Export
+======================
 
 User: ${username}
 Date: ${currentDate}
 
 TASKS
 -----
-${tasks.map((t) => `- [${t.done ? "x" : " "}] ${t.text}`).join("\n")}
+${tasks.map((t) => `- [${t.done ? "x" : " "}] ${t.text} | ${t.category} | ${t.deadline}`).join("\n")}
 
 NOTES
 -----
@@ -280,7 +334,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "studentos-v7-data.txt";
+    link.download = "studentos-final-data.txt";
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -312,7 +366,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
       <div className="login-page">
         <div className="login-card">
           <div className="login-icon">🎓</div>
-          <h1>StudentOS v7</h1>
+          <h1>StudentOS FINAL</h1>
           <p>Your smart student productivity dashboard</p>
 
           <input
@@ -325,7 +379,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
           <button onClick={login}>Enter Dashboard</button>
 
           <div className="login-note">
-            <span>✨ Portfolio Edition</span>
+            <span>✨ Portfolio Ready Edition</span>
           </div>
         </div>
       </div>
@@ -340,11 +394,11 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
             <div className="card card-large hero-card">
               <div className="hero-top">
                 <div>
-                  <p className="eyebrow">StudentOS v7</p>
+                  <p className="eyebrow">StudentOS FINAL</p>
                   <h1>Welcome back, {username} 👋</h1>
                   <p className="muted">
-                    Stay productive with tasks, notes, attendance, goals, focus
-                    sessions, and smarter student tools.
+                    Manage tasks, notes, study hours, attendance, goals,
+                    deadlines, and focus sessions in one smart dashboard.
                   </p>
                   <p className="date-line">{currentDate}</p>
                 </div>
@@ -364,7 +418,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
 
               <div className="stats-grid">
                 <div className="stat-box">
-                  <span>Tasks</span>
+                  <span>Total Tasks</span>
                   <h2>{totalTasks}</h2>
                   <p>{completedTasks} completed</p>
                 </div>
@@ -388,21 +442,10 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
 
             <div className="card">
               <div className="section-title">
-                <h3>Task Manager ✅</h3>
+                <h3>Quick Tasks ✅</h3>
               </div>
-
-              <div className="input-row">
-                <input
-                  type="text"
-                  placeholder="Enter your task..."
-                  value={newTask}
-                  onChange={(e) => setNewTask(e.target.value)}
-                />
-                <button onClick={addTask}>Add</button>
-              </div>
-
               <div className="list-wrap">
-                {tasks.map((task) => (
+                {tasks.slice(0, 4).map((task) => (
                   <div className="list-item" key={task.id}>
                     <div className="list-left">
                       <input
@@ -414,42 +457,6 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
                         {task.text}
                       </span>
                     </div>
-                    <button
-                      className="danger-btn"
-                      onClick={() => deleteTask(task.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="section-title">
-                <h3>Quick Notes 📝</h3>
-              </div>
-
-              <div className="input-row">
-                <input
-                  type="text"
-                  placeholder="Write a quick note..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                />
-                <button onClick={addNote}>Add</button>
-              </div>
-
-              <div className="list-wrap">
-                {notes.map((note) => (
-                  <div className="list-item" key={note.id}>
-                    <span>{note.text}</span>
-                    <button
-                      className="danger-btn"
-                      onClick={() => deleteNote(note.id)}
-                    >
-                      ×
-                    </button>
                   </div>
                 ))}
               </div>
@@ -479,6 +486,19 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
                 </div>
               </div>
             </div>
+
+            <div className="card">
+              <div className="section-title">
+                <h3>Quick Notes 📝</h3>
+              </div>
+              <div className="list-wrap">
+                {notes.slice(0, 3).map((note) => (
+                  <div className="list-item" key={note.id}>
+                    <span>{note.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         );
 
@@ -488,38 +508,71 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
             <div className="card">
               <div className="section-title">
                 <h2>Task Manager</h2>
-                <p>Track all your daily tasks here.</p>
+                <p>
+                  Manage tasks with category, deadline, search, and completion
+                  tracking.
+                </p>
               </div>
 
-              <div className="input-row">
+              <div className="task-form-grid">
                 <input
                   type="text"
-                  placeholder="Add a task..."
+                  placeholder="Task title..."
                   value={newTask}
                   onChange={(e) => setNewTask(e.target.value)}
+                />
+                <select
+                  value={newTaskCategory}
+                  onChange={(e) => setNewTaskCategory(e.target.value)}
+                >
+                  <option>Study</option>
+                  <option>Coding</option>
+                  <option>College</option>
+                  <option>Exam</option>
+                  <option>Personal</option>
+                </select>
+                <input
+                  type="date"
+                  value={newTaskDeadline}
+                  onChange={(e) => setNewTaskDeadline(e.target.value)}
                 />
                 <button onClick={addTask}>Add Task</button>
               </div>
 
+              <div className="search-row">
+                <input
+                  type="text"
+                  placeholder="Search by task or category..."
+                  value={taskSearch}
+                  onChange={(e) => setTaskSearch(e.target.value)}
+                />
+              </div>
+
               <div className="list-wrap">
-                {tasks.map((task) => (
-                  <div className="list-item" key={task.id}>
-                    <div className="list-left">
-                      <input
-                        type="checkbox"
-                        checked={task.done}
-                        onChange={() => toggleTask(task.id)}
-                      />
-                      <span className={task.done ? "done" : ""}>
-                        {task.text}
-                      </span>
+                {filteredTasks.map((task) => (
+                  <div className="task-card" key={task.id}>
+                    <div className="task-top">
+                      <div className="list-left">
+                        <input
+                          type="checkbox"
+                          checked={task.done}
+                          onChange={() => toggleTask(task.id)}
+                        />
+                        <span className={task.done ? "done" : ""}>
+                          {task.text}
+                        </span>
+                      </div>
+                      <button
+                        className="danger-btn"
+                        onClick={() => deleteTask(task.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
-                    <button
-                      className="danger-btn"
-                      onClick={() => deleteTask(task.id)}
-                    >
-                      Delete
-                    </button>
+                    <div className="task-meta">
+                      <span className="tag">{task.category}</span>
+                      <span className="deadline">📅 {task.deadline}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -533,7 +586,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
             <div className="card">
               <div className="section-title">
                 <h2>Quick Notes</h2>
-                <p>Save important reminders and study points.</p>
+                <p>Save and search your important study notes.</p>
               </div>
 
               <div className="input-row">
@@ -546,8 +599,17 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
                 <button onClick={addNote}>Add Note</button>
               </div>
 
+              <div className="search-row">
+                <input
+                  type="text"
+                  placeholder="Search notes..."
+                  value={noteSearch}
+                  onChange={(e) => setNoteSearch(e.target.value)}
+                />
+              </div>
+
               <div className="list-wrap">
-                {notes.map((note) => (
+                {filteredNotes.map((note) => (
                   <div className="list-item" key={note.id}>
                     <span>{note.text}</span>
                     <button
@@ -724,7 +786,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
             <div className="card calendar-page">
               <div className="section-title">
                 <h2>Calendar View</h2>
-                <p>Simple academic date widget for your daily planning.</p>
+                <p>Simple academic date widget for daily planning.</p>
               </div>
 
               <div className="calendar-big">
@@ -747,7 +809,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
                 </div>
                 <div className="tip-card">
                   <h4>📝 Reminder</h4>
-                  <p>Review your notes before sleeping for better retention.</p>
+                  <p>Review notes before sleeping for better retention.</p>
                 </div>
               </div>
             </div>
@@ -797,7 +859,7 @@ ${goals.map((g) => `- ${g.text} (${g.progress}%)`).join("\n")}
             <div className="brand-icon">🎓</div>
             <div>
               <h2>StudentOS</h2>
-              <p>v7 Premium</p>
+              <p>FINAL Premium</p>
             </div>
           </div>
 

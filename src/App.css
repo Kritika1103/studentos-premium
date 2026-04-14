@@ -21,7 +21,8 @@ body.theme-light {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -37,7 +38,7 @@ input {
 
 .login-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 460px;
   border-radius: 28px;
   padding: 32px;
   background: rgba(15, 23, 42, 0.78);
@@ -373,7 +374,8 @@ input {
 .goal-form button,
 .timer-actions button,
 .attendance-actions button,
-.quote-box button {
+.quote-box button,
+.task-form-grid button {
   border: none;
   cursor: pointer;
   border-radius: 14px;
@@ -447,14 +449,25 @@ input {
 }
 
 .input-row,
-.goal-form {
+.goal-form,
+.search-row {
   display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.task-form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
   gap: 12px;
   margin-bottom: 18px;
 }
 
 .input-row input,
 .goal-form input,
+.search-row input,
+.task-form-grid input,
+.task-form-grid select,
 .login-card input {
   flex: 1;
   padding: 14px 16px;
@@ -466,7 +479,10 @@ input {
 }
 
 .light-shell .input-row input,
-.light-shell .goal-form input {
+.light-shell .goal-form input,
+.light-shell .search-row input,
+.light-shell .task-form-grid input,
+.light-shell .task-form-grid select {
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(15, 23, 42, 0.04);
 }
@@ -483,7 +499,8 @@ input {
 .list-item,
 .attendance-card,
 .goal-card,
-.tip-card {
+.tip-card,
+.task-card {
   padding: 14px 16px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
@@ -492,7 +509,8 @@ input {
 .light-shell .list-item,
 .light-shell .attendance-card,
 .light-shell .goal-card,
-.light-shell .tip-card {
+.light-shell .tip-card,
+.light-shell .task-card {
   background: rgba(15, 23, 42, 0.04);
 }
 
@@ -518,6 +536,37 @@ input {
   background: rgba(239, 68, 68, 0.16) !important;
   color: #fecaca !important;
   padding: 10px 14px !important;
+}
+
+.task-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(34, 211, 238, 0.14);
+  color: #67e8f9;
+}
+
+.deadline {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.light-shell .deadline {
+  color: #334155;
 }
 
 .quote-box {
@@ -684,6 +733,10 @@ input {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .task-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 900px) {
@@ -712,6 +765,10 @@ input {
     align-items: flex-start;
     gap: 12px;
   }
+
+  .task-form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -728,7 +785,8 @@ input {
   .timer-actions,
   .attendance-actions,
   .goal-actions,
-  .hero-actions {
+  .hero-actions,
+  .search-row {
     flex-direction: column;
   }
 
@@ -744,5 +802,10 @@ input {
 
   .bar-item {
     min-width: 55px;
+  }
+
+  .task-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
