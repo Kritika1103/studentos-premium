@@ -1,60 +1,115 @@
-# 🎓 StudentOS FINAL
+# 🚀 StudentOS FINAL
 
-StudentOS FINAL is a premium student productivity dashboard built using **React + Vite**.  
-It helps students manage daily academic life with tasks, notes, study tracking, attendance, goals, calendar, and focus sessions — all in one modern responsive interface.
+A **premium student productivity dashboard** built using **React + Vite** for managing academic life in one place.
 
----
+StudentOS helps students manage:
 
-## 🚀 Live Demo
-
-https://studentos-v5.vercel.app/
+- ✅ Tasks
+- ✅ Notes
+- ✅ Coding practice
+- ✅ Calendar
+- ✅ Daily sheets
+- ✅ Profile
+- ✅ Focus timer (Pomodoro)
+- ✅ Dark / Light mode
 
 ---
 
 ## ✨ Features
 
-- 🔐 Login screen UI
-- 🌗 Dark / Light mode toggle
-- 📊 Dashboard analytics cards
-- ✅ Task Manager with:
-  - Task search
-  - Task categories
-  - Task deadlines
-  - Task completion tracking
-- 📝 Quick Notes with search
-- 📚 Weekly Study Tracker
-- 📅 Attendance Tracker with custom subjects
-- 🎯 Goals Tracker with editable progress
-- 📆 Calendar widget
-- ⏱️ Pomodoro focus timer
-- 💬 Motivational quote section
-- 💾 Export all data to text file
-- 📱 Responsive design for laptop and mobile
-- 🧠 LocalStorage support (data remains saved)
+### 🔐 Premium Login Page
+
+- Clean and modern student login UI
+- Department selection
+- Academic year selection
+- Profile photo upload
+- Dark / Light mode support
+
+### 📋 Task Manager
+
+- Add tasks
+- Mark tasks as completed
+- Delete tasks
+- Track total completed work
+
+### 📝 Quick Notes
+
+- Save important notes instantly
+- Delete notes anytime
+- Fast access for study reminders
+
+### 💻 Code Lab
+
+- Practice multiple programming languages:
+  - JavaScript
+  - Python
+  - C
+  - C++
+  - Java
+- Simulated output
+- Basic error detection
+- Input-based program testing
+
+### 📅 Calendar
+
+- Shows today’s real date
+- Displays upcoming academic reminders
+
+### 📊 Daily Sheets
+
+- Attendance status
+- Session usage time
+- Total app usage tracking
+- Daily productivity records
+
+### 👤 Profile Center
+
+- Shows student name
+- Department
+- Year
+- Profile photo update support
+
+### ⏱ Pomodoro Focus Timer
+
+- Start / Pause / Reset
+- 25-minute focus session support
+- Productivity improvement tool
+
+### 🌙 Theme Support
+
+- Dark mode
+- Light mode
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-- React.js
-- Vite
-- CSS3
-- LocalStorage
-- Vercel Deployment
+- **React**
+- **Vite**
+- **JavaScript (JSX)**
+- **CSS3**
+- **LocalStorage**
 
 ---
 
 ## 📂 Project Structure
 
-- `src/App.jsx`
-- `src/App.css`
-- `README.md`
-
----
-
-## ▶️ Run Locally
-
-```bash
-npm install
-npm run dev
+```text
+studentos-v4/
+├── public/
+├── src/
+│   ├── components/
+│   ├── data/
+│   ├── utils/
+│   ├── App.jsx
+│   ├── App.css
+│   ├── index.css
+│   └── main.jsx
+├── package.json
+├── vite.config.js
+└── README.md
 ```
+
+## 🌐 Live Demo
+
+🔗 [Open StudentOS Live Project](https://studentos-premium.vercel.app)
