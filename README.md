@@ -2,16 +2,19 @@
 
 A **premium student productivity dashboard** built using **React + Vite** for managing academic life in one place.
 
-StudentOS helps students manage:
+---
 
-- ✅ Tasks
-- ✅ Notes
-- ✅ Coding practice
-- ✅ Calendar
-- ✅ Daily sheets
-- ✅ Profile
-- ✅ Focus timer (Pomodoro)
-- ✅ Dark / Light mode
+## 🌐 Live Demo
+
+🔗 [Open StudentOS Live Project](https://studentos-premium.vercel.app)
+
+---
+
+## 📌 About The Project
+
+**StudentOS** is a modern and responsive student productivity web application designed to help students organize their daily academic activities efficiently.
+
+It combines essential student tools like task management, notes, code practice, attendance tracking, calendar reminders, focus timer, and profile settings — all in one clean interface.
 
 ---
 
@@ -30,7 +33,7 @@ StudentOS helps students manage:
 - Add tasks
 - Mark tasks as completed
 - Delete tasks
-- Track total completed work
+- Track completed work
 
 ### 📝 Quick Notes
 
@@ -92,7 +95,7 @@ StudentOS helps students manage:
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```text
 studentos-v4/
@@ -109,7 +112,3 @@ studentos-v4/
 ├── vite.config.js
 └── README.md
 ```
-
-## 🌐 Live Demo
-
-🔗 [Open StudentOS Live Project](https://studentos-premium.vercel.app)
